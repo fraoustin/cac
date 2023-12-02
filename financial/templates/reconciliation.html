@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+<div class="row align-items-center">
+    <div class="col">
+      <div class="input-icon">
+          <span class="input-icon-addon">
+              <i class="si-search fs-1"></i>
+          </span>
+          <input id="search" type="text" value="" class="form-control form-control-rounded m-2" placeholder="Rechercher dans les mouvements">
+      </div>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Reconciliation") %}
+        <a href="#" class="btn btn-outline-success" onclick="window.document.formreconciliation.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-disk fs-2"></i>
+            </span>
+            Reconcilier
+        </a>
+        {% endif %}
+        <a href="#" class="btn btn-outline-success without-border" onclick="export_table_to_csv('table', 'reconciliation.csv');">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-download fs-2"></i>
+            </span>
+        </a>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="page-body">     
+    <div class="table-responsive">
+        <table style="width: 90%;">
+            <tr>
+                <td><label class="form-label m-2">Montant Rapproché: </label></td>
+                <td><span id="mntr"></span></td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Montant Pointé: </label></td>
+                <td><span id="mntp"></span></td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Montant Rapproché et Pointé: </label></td>
+                <td><span id="mntrp"></span></td>
+            </tr>
+        </table>
+    </div> 
+    <form action="{{ config['APP_BASE_URL'] }}/reconciliation" method="POST" name="formreconciliation">        
+        <div class="table-responsive">
+            <table id="table" class="table table-vcenter">
+                <thead class="sticky-top">
+                    <tr>
+                        <th>id</th>
+                        <th>compte</th>
+                        <th>date</th>
+                        <!--<th>type</th>-->
+                        <th>tiers</th>
+                        <th>montant</th>
+                        <th>rapprocher</th>
+                        <th>pointé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mvt in mvts %}
+                    <tr class="cursor-pointer" style="{% if mvt.closed.name == 'oui' %}display:none{% endif %}">
+                        <td>{{ mvt.id }}</td>
+                        <td>{{ mvt.compte.name }}</td>
+                        <td>{{ mvt.dte.strftime('%d/%m/%Y') }}</td>
+                        <!--<td>{{ mvt.typ.name }}</td>-->
+                        <td>{{ mvt.tiers }}</td>
+                        <td class="{% if mvt.value > 0 %}text-green{% else %}text-red{% endif %}">{{ '%0.2f €'| format(mvt.value) }}</td>
+                        <td><span class="status {% if mvt.closed.name == 'oui' %}status-green{% else %}status-blue{% endif %}">{{ mvt.closed.name }}</span></td>
+                        <td><input name="{{ mvt.id }}" id="{{ mvt.id }}" {% if mvt.closed.name == 'oui' %}disabled{% endif %} class="form-check-input" type="checkbox" onclick="changeValueMnt()"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<script>
+function changeValueMnt() {
+    var mntp = 0;
+    var mntr = 0;
+    var mntrp = 0;
+    var rows = document.getElementById("table").querySelectorAll("tbody tr:not(.hidden)");
+    for (var i = 0; i < rows.length; i++) {
+        var mnt = parseFloat(rows[i].querySelectorAll("td")[4].innerText.replace(/[^0-9.-]+/g,""));
+        if (rows[i].querySelectorAll("td")[5].innerText == "oui") {
+            mntr = mntr + mnt;
+            mntrp = mntrp + mnt;
+        };
+        if (rows[i].querySelectorAll("input")[0].checked) {
+            mntp = mntp + mnt;
+            mntrp = mntrp + mnt;
+        };
+	};
+    document.getElementById("mntr").innerText = mntr.toFixed(2) + ' €';
+    document.getElementById("mntp").innerText = mntp.toFixed(2) + ' €';
+    document.getElementById("mntrp").innerText = mntrp.toFixed(2) + ' €';
+}
+changeValueMnt();
+const targetNode = document.getElementById("table");
+
+// Options for the observer (which mutations to observe)
+const config = { attributes: true, childList: true, subtree: true };
+
+// Callback function to execute when mutations are observed
+const callback = (mutationList, observer) => {
+    changeValueMnt();
+};
+
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback);
+
+// Start observing the target node for configured mutations
+observer.observe(targetNode, config);
+</script>
+{% endblock %}

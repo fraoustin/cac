@@ -1,0 +1,11 @@
+# ignore python compile
+*.pyc
+__pycache__
+# ignore pip file
+/dist
+/files/uploads
+/*.egg-info
+# ignore file swp vi
+.nogit
+*.swp
+app.db

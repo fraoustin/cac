@@ -47,7 +47,9 @@
                     <td>
                         <select class="form-select form-control m-2" id="id_compte" name="id_compte">
                             {% for compte in comptes %}
+                                {% if compte.status.name == 'ouvert' %}
                                 <option value="{{ compte.id }}" {% if compte.default.name == 'oui' %}selected{% endif %}>{{ compte.name }}</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                     </td>

@@ -122,7 +122,7 @@ def mouvements():
             anaaxe.id_axe = key[4:]
             anaaxe.value = request.form[key]
             anaaxe.save()
-        flash('Mouvement %s is created with value %s' % (obj.id, '%.2f' % obj.value), 'success')
+        flash('Mouvement %s is created with value %s' % (obj.id, '%.2f €' % obj.value), 'success')
     return render_template('mouvements.html', mvts=Mvt.query.order_by(Mvt.dte.desc()).all(), axes=Axe.query.all(), comptes=Compte.query.all(), tiers=getParamValue('tiers').split(";"), now=datetime.now())
 
 
@@ -133,12 +133,15 @@ def analytics():
 
 
 @login_required
-@checkAuthorization('Closed Mouvement')
-def closed(id):
-    obj = Mvt.query.filter_by(id=id).first()
-    obj.closed = 'oui'
-    obj.save()
-    return "ok"
+@checkAuthorization('Reconciliation')
+def reconciliation():
+    if request.method == 'POST': 
+        for key in request.form.keys():
+            obj = Mvt.query.filter_by(id=key).first()
+            obj.closed = 'oui'
+            obj.save()
+        flash('Reconciliation is ok', 'success')
+    return render_template('reconciliation.html', mvts=Mvt.query.order_by(Mvt.dte).all())
 
 
 class Financial(Blueprint):
@@ -154,7 +157,7 @@ class Financial(Blueprint):
         self.add_url_rule('/axe/<int:id>', 'update_axe', update_axe, methods=['POST', 'GET'])
         self.add_url_rule('/mouvements', 'mouvements', mouvements, methods=['POST', 'GET'])
         self.add_url_rule('/analytics', 'analytics', analytics, methods=['GET', ])
-        self.add_url_rule('/closed/<int:id>', 'closed', closed, methods=['POST', ])
+        self.add_url_rule('/reconciliation', 'reconciliation', reconciliation, methods=['POST', 'GET'])
 
     def _init(self):
         current_app.logger.debug("init financial on first request")
@@ -167,6 +170,7 @@ class Financial(Blueprint):
         current_app.config['APP_MENU'].append({"href": "/axes", "icon": "si-bolt", "title": "Axe", "authorization": "Axe"})
         current_app.config['APP_MENU'].append({"href": "/mouvements", "icon": "si-credit-card", "title": "Mouvement", "authorization": "Mouvement"})
         current_app.config['APP_MENU'].append({"href": "/analytics", "icon": "si-eye", "title": "Analytique", "authorization": "Analytic"})
+        current_app.config['APP_MENU'].append({"href": "/reconciliation", "icon": "si-check-square", "title": "Reconciliation", "authorization": "Reconciliation"})
 
     def init_db(self):
         if getParamValue('tiers') is None:

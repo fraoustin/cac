@@ -39,6 +39,7 @@
                 <tr>
                     <th>Nom</th>
                     <th>Montant</th>
+                    <th>Montant Rapproché</th>
                     <th>Default</th>
                     <th>Status</th>
                 </tr>
@@ -48,6 +49,7 @@
                 <tr class="cursor-pointer" onclick="window.location='{{ config['APP_BASE_URL'] }}/compte/{{ compte.id }}'">
                     <td>{{ compte.name }}</td>
                     <td class="{% if compte.mvts | sum(attribute='value') >= 0 %}text-green{% else %}text-red{% endif %}">{{ "%.2f €"|format(compte.mvts | sum(attribute='value')) }}</td>
+                    <td class="{% if compte.mvts | rejectattr('closed.name', 'eq', 'non') | sum(attribute='value') >= 0 %}text-green{% else %}text-red{% endif %}">{{ "%.2f €"|format(compte.mvts | rejectattr('closed.name', 'eq', 'non') | sum(attribute='value')) }}</td>
                     <td><span  class="status {% if compte.default.name == 'oui' %}status-green{% else %}status-blue{% endif %}">{{ compte.default.name }}</span></td>
                     <td><span  class="status {% if compte.status.name == 'ouvert' %}status-green{% else %}status-red{% endif %}">{{ compte.status.name }}</span></td>
                 </tr>
