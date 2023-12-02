@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<!--
+  <div class="container has-pt-16 has-pb-16">
+    <div class="has-w-96 has-pl-4 has-pr-4 has-ml-auto has-mr-auto">
+      <h2>{{ config['APP_NAME'] }}</h2>
+
+      <div class="card is-shadowed">
+        <h3><i class="si-login"></i> Connexion</h3>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert is-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="has-mb-4">
+          <label class="label">Votre Email</label>
+          <input name="email" type="text" class="input" placeholder="my@email.com" />
+        </div>
+        <div class="has-mb-6">
+          <label class="label">Votre mot de passe</label>
+          <input name="password" type="password" id="password" class="input" placeholder="mot de passe"
+            onKeyPress="if(event.keyCode == 13) document.querySelector('form').submit();" />
+        </div>
+        <button class="button is-full" onclick="document.querySelector('form').submit()">
+          <i class="si-lock has-pr-1"></i>
+          <span>Login</span>
+        </button>
+
+      </div>
+    </div>
+  -->
+<div class="page page-center">
+  <div class="container container-tight py-4">
+    
+    <div class="text-center mb-4">
+      <a href="." class="navbar-brand navbar-brand-autodark"><img src="./img/logo-black.png" alt="Tabler"
+          class="navbar-brand-image">
+      </a>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-danger" role="alert">
+      {{ message }}
+    </div>
+    
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+
+    <div class="card card-md">
+      <div class="card-body">
+        <form action="{{ config['APP_BASE_URL'] }}/login" method="POST">
+
+          <h2 class="h2 text-center mb-4">Connectez vous à votre compte</h2>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input name="email" type="email" class="form-control" placeholder="votre@email.com" autocomplete="off">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">
+              Mot de passe
+            </label>
+            <div class="input-group input-group-flat">
+              <input name="password" type="password" id="password" class="form-control" placeholder="Your password"
+                autocomplete="off">
+              <span class="input-group-text">
+                  <i id="password_visibility_icon" class="si-eye icon" onclick="switch_visibility_password()"></i>
+                </a>
+              </span>
+            </div>
+          </div>
+          <div class="form-footer">
+            <button type="submit" class="btn btn-indigo w-100">Sign in</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  function switch_visibility_password() {
+    var password = document.getElementById("password");
+    var icon_visibility = document.getElementById("password_visibility_icon");
+    if (password.type === "password") {
+      password.type = "text";
+      icon_visibility.classList.add("si-eye-slash");
+      icon_visibility.classList.remove("si-eye");
+    } else {
+      password.type = "password";
+      icon_visibility.classList.add("si-eye");
+      icon_visibility.classList.remove("si-eye-slash");
+    }
+  }
+</script>
+{% endblock %}

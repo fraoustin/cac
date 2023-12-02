@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="page-center">
+	<div class="container container-tight py-4">
+	
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header">
+					<h3 class="card-title">{{ config['APP_NAME'] }} <bold>{{ version }}</bold> utilise</h3>
+				</div>
+				<div class="card-body">
+					<div class="row g-3">
+						<div class="col-6">
+							<div class="row g-3 align-items-center">
+						
+								<div class="col text-truncate">
+									<a href="https://flask.palletsprojects.com/">Flask</a> ({{ flaskversion }})
+								</div>
+							</div>
+						</div>
+						{% for blueprint in blueprints %}
+						<div class="col-6">
+							<div class="row g-3 align-items-center">
+	
+								<div class="col text-truncate">
+									<a >{{ blueprint.name }}</a> ({{ blueprint.version }})
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+
+
+						<div class="col-6">
+							<div class="row g-3 align-items-center">
+						
+								<div class="col text-truncate">
+									<a href="/swagger">Détails des APIs</a>
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="row g-3 align-items-center">
+						
+								<div class="col text-truncate">
+									<a href="https://siimple.xyz/icons/">Icones Siimple</a>
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="row g-3 align-items-center">
+						
+								<div class="col text-truncate">
+									<a href="https://tabler.io/">Tabler</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+
+	
+</div>
+
+
+{% endblock %}

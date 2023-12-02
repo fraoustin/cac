@@ -1,0 +1,55 @@
+Table compte {
+    id integer [pk, increment]
+    name string [unique]
+    description string
+    default typ_default [default: 'non']
+    status typ_status [default: 'ouvert']
+}
+
+enum typ_default {
+    oui
+    non
+}
+
+enum typ_status {
+    ouvert
+    fermer
+}
+
+Table axe {
+    id integer [pk, increment]
+    name string [unique]
+    listing string [not null]
+}
+
+Table mvt {
+    id integer [pk, increment]
+    id_compte integer [ref: > compte.id]
+    typ typ_mvt [default: 'debit']
+    dte date [not null]
+    value decimal [default: 0]
+    tiers string
+    description string
+    closed typ_default [default: 'non']
+}
+
+enum typ_mvt {
+    debit
+    credit
+}
+
+Table analytic {
+    id integer [pk, increment]
+    id_mvt integer [ref: > mvt.id]
+    value decimal [default: 0]
+    dte date [not null]
+    tiers string
+    description string
+}
+
+Table analyticaxe {
+    id integer [pk, increment]
+    id_analytic integer [ref: > analytic.id]
+    id_axe integer [ref: > axe.id]
+    value string [not null]
+}

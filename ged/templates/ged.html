@@ -1,0 +1,65 @@
+{% set backurl={None:'/'}.get(backurl, backurl) %}
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+
+
+<div class="row align-items-center">
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Ged") %}
+        <a href="#" class="btn btn-outline-primary" onclick="window.document.formged.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-share fs-2"></i>
+            </span>
+            {% if ged.id != None %}Modifier{% else %}Enregistrer{% endif %} le fichier           
+        </a>
+        {% endif %}
+        
+        {% if current_user.has_authorization("Ged")  and  ged.id != None  %}
+        <a href="#" class="btn btn-outline-danger" onclick="window.document.formgeddel.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-trash fs-2"></i>
+            </span>
+            Supprimer le fichier
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+<h1>Fichier {{ ged.name }}</h1>
+{% if ged.id != None %}
+<form action="{{ config['APP_BASE_URL'] }}/ged/{{ ged.id }}" class="update" method="POST" name="formged" enctype=multipart/form-data>
+{% else %}
+<form action="{{ config['APP_BASE_URL'] }}/ged" class="new" method="POST" name="formged" enctype=multipart/form-data>
+{% endif %}
+    <input class="hidden" id="backurl" name="backurl" value="{{ backurl }}">
+    <table>        
+        {% if ged.path|length > 1 %}
+        <tr>
+            <td><label class="form-label m-2">Fichier: </label></td>
+            <td>
+                <a href="{{ config['APP_BASE_URL'] }}/uploads/{{ ged.path }}" download="{{ ged.name }}">{{ ged.name }}</a>
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td><label class="form-label m-2">Description: </label></td>
+            <td><textarea class="form-control m-2" name="description" rows="20"  id="description" placeholder="Content ...">{{ ged.description }}</textarea></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Upload: </label></td>
+            <td><input name="file" id="file" type="file" class="form-control  m-2"></td>
+        </tr>
+    </table>
+</form>
+<form action="{{ config['APP_BASE_URL'] }}/delged/{{ ged.id }}" method="POST" name="formgeddel">
+    <input class="hidden" name="backurl" value="{{ backurl }}">
+</form>
+
+{% endblock %}

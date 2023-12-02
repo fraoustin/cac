@@ -1,0 +1,8 @@
+werkzeug==2.3.4
+Flask==2.2.5
+python-ldap>=3.3.0
+Flask-Login>=0.4.0
+Flask-SQLAlchemy==3.0.3
+unidecode>=1.1.1
+hdbcli>=0.0.1
+dbml-to-sqlalchemy>=0.9.2

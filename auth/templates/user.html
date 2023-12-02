@@ -1,0 +1,98 @@
+{% set backurl={None:'/'}.get(backurl, backurl) %}
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+
+
+<div class="row align-items-center">
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Admin.update_user") %}
+        <a href="#" class="btn btn-outline-primary" onclick="window.document.formuser.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-user fs-2"></i>
+            </span>
+            {% if user.id != None %}Modifier{% else %}Enregistrer{% endif %} l'utilisateur            
+        </a>
+        {% endif %}
+        
+        {% if user.id != None and current_user.id != user.id and current_user.has_authorization("Admin.delete_user") %}
+        <a href="#" class="btn btn-outline-danger" onclick="window.document.formuserdel.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-user-minus fs-2"></i>
+            </span>
+            Supprimer l'utilisateur
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+<h1>User {{ user.name }}</h1>
+{% if user.id != None %}
+<form action="{{ config['APP_BASE_URL'] }}/user/{{ user.id }}" class="update" method="POST" name="formuser">
+{% else %}
+<form action="{{ config['APP_BASE_URL'] }}/user" class="new" method="POST" name="formuser">
+{% endif %}
+    <input class="hidden" id="backurl" name="backurl" value="{{ backurl }}">
+    <table>
+        <tr>
+            <td><label class="form-label m-2">Nom: </label></td>
+            <td><input name="name" id="name" class="form-control m-2" value="{{ user.name }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Prénom: </label></td>
+            <td><input name="forname" id="forname" class="form-control m-2" value="{{ user.forname }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Email: </label></td>
+            <td><input name="email" id="email" class="form-control m-2" value="{{ user.email }}" type="email" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Mot de passe: </label></td>
+            <td><input name="password" id="password" type="password" class="form-control m-2" value="">
+            </td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Is Admin: </label></td>
+            <td>
+                <div class="form-check form-switch m-2"><input class="form-check-input" type="checkbox" id="isadmin"
+                        name="isadmin" {% if user.isadmin %}checked{% endif %} {% if not current_user.isadmin
+                        %}disabled{% endif %}><label for="isadmin"></label></div>
+            </td>
+        </tr>
+        {% if user.id != None %}
+        <tr>
+            <td><label class="form-label m-2">apikey: </label></td>
+            <td>{{ user.apikey }}</td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">token: </label></td>
+            <td>{{ user.token }}</td>
+        </tr>
+        {% endif %}        
+        {% if current_user.has_authorization("Admin.update_user") %}
+        <tr>
+            <td><label class="form-label m-2">Authorisation: </label></td>
+            <td></td>
+        </tr>
+        {% for autho in config['APP_AUTHORIZATION'] %}
+        <tr>
+            <td style="text-align:end;">{{ autho }}</td>
+            <td>
+                <div class="form-check form-switch m-2"><input class="form-check-input" type="checkbox" id="autho-{{ autho }}"
+                        name="autho-{{ autho }}" {% if user.has_authorization(autho) %}checked{% endif %} ><label for="autho-{{ autho }}"></label></div>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </table>
+</form>
+<form action="{{ config['APP_BASE_URL'] }}/deluser/{{ user.id }}" method="POST" name="formuserdel">
+    <input class="hidden" name="backurl" value="{{ backurl }}">
+</form>
+{% endblock %}

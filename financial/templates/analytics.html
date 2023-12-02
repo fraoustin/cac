@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+<div class="row align-items-center">
+    <div class="col">
+      <div class="input-icon">
+          <span class="input-icon-addon">
+              <i class="si-search fs-1"></i>
+          </span>
+          <input id="search" type="text" value="" class="form-control form-control-rounded m-2" placeholder="Rechercher dans l'analytique'">
+      </div>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <a href="#" class="btn btn-outline-success without-border" onclick="export_table_to_csv('table', 'analytics.csv');">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-download fs-2"></i>
+            </span>
+        </a>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="page-body">
+    <div class="table-responsive">
+        <table id="table" class="table table-vcenter">
+            <thead class="sticky-top">
+                <tr>
+                    <th>id</th>
+                    <th>compte</th>
+                    <th>date</th>
+                    <th>tiers</th>
+                    <th>value</th>
+                    {% for axe in axes %}
+                    <th>{{ axe.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for analytic in analytics %}
+                <tr class="cursor-pointer">
+                    <td>{{ analytic.id }}</td>
+                    <td>{{ analytic.mvt.compte.name }}</td>
+                    <td>{{ analytic.dte.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ analytic.tiers }}</td>
+                    <td class=" {% if analytic.value > 0 %}text-green{% else %}text-red{% endif %}">{{ '%0.2f'| format(analytic.value) }}</td>                    
+                    {% for axe in axes %}
+                    <td>{{ analytic.filter('analyticaxes', 'id_axe', axe.id)[0].value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('date'),
+    		buttonText: {
+    			previousMonth: '<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left --><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>',
+    			nextMonth: '<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right --><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg>',
+    		},
+            lang:'fr-FR',
+            format:'DD/MM/YYYY',
+    	}));
+    });
+    // @formatter:on
+</script>
+{% endblock %}

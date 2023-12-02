@@ -1,0 +1,74 @@
+{% set backurl={None:'/'}.get(backurl, backurl) %}
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+
+
+<div class="row align-items-center">
+    <div class="col">
+        <div class="btn-list">
+          <a href="{% if compte.id != None %}../{% endif %}comptes" class="btn btn-ghost-success" onclick="">
+              <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                  <i class="si-chevron-left fs-2"></i>
+              </span>       
+          </a>
+        </div>
+    </div>  
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Compte") %}
+        <a href="#" class="btn btn-outline-primary" onclick="window.document.formcompte.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-share fs-2"></i>
+            </span>
+            {% if compte.id != None %}Modifier{% else %}Enregistrer{% endif %} le compte           
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+<h1>Compte {{ compte.name }}</h1>
+{% if compte.id != None %}
+<form action="{{ config['APP_BASE_URL'] }}/compte/{{ compte.id }}" class="update" method="POST" name="formcompte">
+{% else %}
+<form action="{{ config['APP_BASE_URL'] }}/compte" class="new" method="POST" name="formcompte">
+{% endif %}
+    <input class="hidden" id="backurl" name="backurl" value="{{ backurl }}">
+    <table>
+        <tr>
+            <td><label class="form-label m-2">Nom: </label></td>
+            <td><input name="name" id="name" class="form-control m-2" value="{{ compte.name }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Defaut: </label></td>
+            <td>
+                <select class="form-select form-control m-2" id="default" name="default">
+                    {% for default in compte.default.__class__ %}
+                        <option value="{{ default.name }}" {% if compte.default.name == default.name %}selected{% endif %}>{{ default.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Status: </label></td>
+            <td>
+                <select class="form-select form-control m-2" id="status" name="status">
+                    {% for status in compte.status.__class__ %}
+                        <option value="{{ status.name }}" {% if compte.status.name == status.name %}selected{% endif %}>{{ status.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Description: </label></td>
+            <td><textarea class="form-control m-2" name="description" rows="20"  id="description" placeholder="Content..">{{ compte.description }}</textarea></td>
+        </tr>
+    </table>
+</form>
+
+{% endblock %}

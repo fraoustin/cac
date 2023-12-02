@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ config['APP_NAME'] }}</title>
+    <link rel="shortcut icon" href="{{ config['APP_BASE_URL'] }}/css/favicon.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="color-scheme" content="light primary" />
+
+    <!-- tabler css framework -->
+    <link rel="stylesheet" href="{{ config['APP_BASE_URL'] }}/tabler/tabler.css">
+    <!-- siimple icons -->
+    <link rel="stylesheet" href="{{ config['APP_BASE_URL'] }}/css/siimple-icons.css" /> <!-- https://cdn.jsdelivr.net/npm/siimple-icons/siimple-icons.css -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ config['APP_BASE_URL'] }}/css/menu.css">
+    <link rel="stylesheet" href="{{ config['APP_BASE_URL'] }}/css/app.css">
+
+</head>
+
+<body class="d-flex flex-column vw-100">
+
+    {% if current_user.is_authenticated %}
+
+    <aside class="navbar navbar-vertical navbar-expand-lg" data-bs-theme="dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
+                aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <h1 class="navbar-brand navbar-brand-autodark cursor-pointer" onclick="window.location='{{ config['APP_BASE_URL'] }}'">
+                    <img src="{{ config['APP_BASE_URL'] }}/img/logo-white.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+            </h1>
+            <div class="collapse navbar-collapse" id="sidebar-menu">
+                <ul class="navbar-nav pt-lg-3">
+                    
+                    {% for menu in config['APP_MENU'] %}
+                    {% if current_user.has_authorization(menu.authorization) %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ config['APP_BASE_URL'] }}{{ menu.href }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="{{ menu.icon }} fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">
+                                {{ menu.title }}
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ config['APP_BASE_URL'] }}/currentuser">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="si-user-circle fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">
+                                Votre profil
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ config['APP_BASE_URL'] }}/logout">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="si-logout fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">
+                                Déconnexion
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+
+
+    {% endif %}
+    <div class="page-wrapper" style="padding-left: 20px;padding-right: 20px;">
+    {% if current_user.is_authenticated %}
+    
+    <div class="page-header">
+        {% block navbar %}{% endblock %}
+    </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{category}}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% endif %}
+
+        {% block body %}
+        {% endblock %}
+    </div>
+
+    <!-- tabler -->
+    <script src="{{ config['APP_BASE_URL'] }}/tabler/tabler.js"></script>
+    <script src="{{ config['APP_BASE_URL'] }}/tabler/litepicker.js"></script>
+
+    <!-- JAVASCRIPT -->
+    <script src="{{ config['APP_BASE_URL'] }}/js/app.js"></script>
+</body>
+
+</html>

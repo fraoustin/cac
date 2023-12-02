@@ -1,0 +1,20 @@
+#local-menu-general,
+#menu-button-change-size {
+    transition-duration: 0.8s;
+}
+
+
+.local-center-width {
+    margin: auto;
+    width: max-content;
+}
+
+.hidden {
+    display: none;
+}
+
+
+#navbar > li > div {
+    background-color: rgba(0,0,0, 0.1);
+    margin-left: 2em;
+}

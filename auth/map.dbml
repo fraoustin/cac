@@ -1,0 +1,15 @@
+Table user {
+    id integer [primary key, increment]
+    email varchar [not null, unique]
+    name varchar [not null]
+    forname varchar
+    password varchar [not null]
+    lastconnection timestamp
+    isadmin boolean [not null, default: False]
+    gravatar boolean [not null, default: False]
+    apikey varchar
+    token varchar
+    created_at timestamp
+    is_deleted boolean [not null, default: False]
+    authorization string
+}

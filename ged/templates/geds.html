@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+<div class="row align-items-center">
+    <div class="col">
+      <div class="input-icon">
+          <span class="input-icon-addon">
+              <i class="si-search fs-1"></i>
+          </span>
+          <input id="search" type="text" value="" class="form-control form-control-rounded m-2" placeholder="Rechercher dans les fichiers">
+      </div>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Ged") %}
+        <a href="#" class="btn btn-outline-success" onclick="window.location='{{ config['APP_BASE_URL'] }}/ged'">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-share fs-2"></i>
+            </span>
+            Ajouter un fichier
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="page-body">  
+    <div id="table" class="table-responsive">
+        <table class="table table-vcenter">
+            <thead class="sticky-top">
+                <tr>
+                    <th>Nom</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ged in geds %}
+                <tr class="cursor-pointer" onclick="window.location='{{ config['APP_BASE_URL'] }}/ged/{{ ged.id }}'">
+                    <td>{{ ged.name }}</td>
+                    <td>{{ ged.description[0:50] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

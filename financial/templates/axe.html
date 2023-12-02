@@ -1,0 +1,54 @@
+{% set backurl={None:'/'}.get(backurl, backurl) %}
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+
+
+<div class="row align-items-center">
+    <div class="col">
+        <div class="btn-list">
+          <a href="{% if axe.id != None %}../{% endif %}axes" class="btn btn-ghost-success" onclick="">
+              <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                  <i class="si-chevron-left fs-2"></i>
+              </span>       
+          </a>
+        </div>
+    </div> 
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Axe") %}
+        <a href="#" class="btn btn-outline-primary" onclick="window.document.formaxe.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-share fs-2"></i>
+            </span>
+            {% if axe.id != None %}Modifier{% else %}Enregistrer{% endif %} l'axe analytique           
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+<h1>Axe {{ axe.name }}</h1>
+{% if axe.id != None %}
+<form action="{{ config['APP_BASE_URL'] }}/axe/{{ axe.id }}" class="update" method="POST" name="formaxe">
+{% else %}
+<form action="{{ config['APP_BASE_URL'] }}/axe" class="new" method="POST" name="formaxe">
+{% endif %}
+    <input class="hidden" id="backurl" name="backurl" value="{{ backurl }}">
+    <table>
+        <tr>
+            <td><label class="form-label m-2">Nom: </label></td>
+            <td><input name="name" id="name" class="form-control m-2" value="{{ axe.name }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Valeurs: </label></td>
+            <td><textarea class="form-control m-2" name="listing" rows="20"  id="listing" placeholder="Value1">{{ axe.listing }}</textarea></td>
+        </tr>
+    </table>
+</form>
+
+{% endblock %}

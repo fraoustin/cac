@@ -1,0 +1,55 @@
+{% set backurl={None:'/'}.get(backurl, backurl) %}
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+
+
+<div class="row align-items-center">
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <a href="#" class="btn btn-outline-primary" onclick="window.document.formuser.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-user fs-2"></i>
+            </span>
+            Modifier l'utilisateur            
+        </a>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+<h1>User {{ current_user.name }}</h1>
+<form action="{{ config['APP_BASE_URL'] }}/user/{{ current_user.id }}" method="POST" name="formuser">
+    <input class="hidden" id="backurl" name="backurl" value="{{ backurl }}">
+    <table>
+        <tr>
+            <td><label class="form-label m-2">Nom: </label></td>
+            <td><input name="name" id="name" class="form-control m-2" value="{{ current_user.name }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Prénom: </label></td>
+            <td><input name="forname" id="forname" class="form-control m-2" value="{{ current_user.forname }}" required></td>
+        </tr>
+        <tr class="hidden">
+            <td><label class="form-label m-2">Email: </label></td>
+            <td><input name="email" id="email" class="form-control m-2" value="{{ current_user.email }}" type="email" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Mot de passe: </label></td>
+            <td><input name="password" id="password" type="password" class="form-control m-2" value="" required>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">apikey: </label></td>
+            <td><input name="apikey" id="apikey" class="form-control m-2" value="{{ current_user.apikey }}" readonly></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">token: </label></td>
+            <td><input name="token" id="token" class="form-control m-2" value="{{ current_user.token }}" readonly></td>
+        </tr>
+    </table>
+</form>
+{% endblock %}

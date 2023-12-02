@@ -1,0 +1,6 @@
+Table ged {
+    id integer [pk, increment]
+    name string [unique]
+    path string [not null]
+    description string
+}

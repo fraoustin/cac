@@ -1,0 +1,5 @@
+Table param {
+    name varchar [primary key]
+    type varchar [not null]
+    value varchar [not null]
+}
