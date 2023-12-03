@@ -1,0 +1,180 @@
+{% set backurl={None:'/'}.get(backurl, backurl) %}
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+
+
+<div class="row align-items-center">
+    <div class="col">
+        <div class="btn-list">
+          <a href="{% if note.id != None %}../{% endif %}notes" class="btn btn-ghost-success" onclick="">
+              <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                  <i class="si-chevron-left fs-2"></i>
+              </span>       
+          </a>
+        </div>
+    </div>  
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Note") and note.status.name == 'draft' %}
+        <a href="#" class="btn btn-outline-primary" onclick="window.document.formnote.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-share fs-2"></i>
+            </span>
+            {% if note.id != None %}Modifier{% else %}Enregistrer{% endif %} la note           
+        </a>
+        {% endif %}
+        {% if current_user.has_authorization("Note") and note.status.name == 'draft' %}
+        <a href="#" class="btn btn-outline-success" onclick="document.getElementById('status').value='presented';window.document.formnote.submit()">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-send fs-2"></i>
+            </span>
+            Envoyer la note           
+        </a>
+        {% endif %}
+        {% if current_user.has_authorization("Valid Note") and note.status.name == 'presented' %}
+        <a href="../validnotes/{{ note.id}}/valided" class="btn btn-ghost-success" onclick="">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-check-square fs-2"></i>
+            </span>       
+        </a>
+        <a href="../validnotes/{{ note.id}}/rejected" class="btn btn-ghost-danger" onclick="">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-x-square fs-2"></i>
+            </span>       
+        </a>
+        <a href="../validnotes/{{ note.id}}/draft" class="btn btn-ghost-info" onclick="">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-question-square fs-2"></i>
+            </span>       
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+<h1>Note {{ note.title }}</h1>
+{% if note.id != None %}
+<form action="{{ config['APP_BASE_URL'] }}/note/{{ note.id }}" class="update" method="POST" name="formnote">
+{% else %}
+<form action="{{ config['APP_BASE_URL'] }}/note" class="new" method="POST" name="formnote">
+{% endif %}
+    <input class="hidden" id="backurl" name="backurl" value="{{ backurl }}">
+    <table>
+        <tr>
+            <td><label class="form-label m-2">Titre: </label></td>
+            <td><input name="title" id="title" class="form-control m-2" value="{{ note.title }}" required {% if note.status.name  not in ['draft', ]  %}disabled{% endif %}></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Qui: </label></td>
+            <td><input name="who" id="who" class="form-control m-2" value="{{ note.who }}" required {% if not current_user.has_authorization('Valid Note') or note.status.name != 'draft' %}disabled{% endif %}></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Montant global: </label></td>            
+            <td class="text-green"><span class="m-2">{{ "%.2f €"|format(note.noteanalytics | sum(attribute='value')) }}</span></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Date: </label></td>
+            <td><input class="form-control m-2" placeholder="Select a date" value="{{ note.dte.strftime('%d/%m/%Y') }}"  name="dte" id="dte" disabled></input></td>
+        </tr>
+        <tr class="hidden">
+            <td><label class="form-label m-2">Status: </label></td>
+            <td><input name="dte" id="dte" class="form-control m-2" value="{{ note.dte.strftime('%d/%m/%Y') }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Status: </label></td>
+            <td><span  class="m-2 status {% if note.status.name == 'presented' %}status-purple{% elif note.status.name == 'valided' %}status-green{% elif note.status.name == 'rejected' %}status-red{% else %}status-grey{% endif %}">{{ note.status.name }}</span></td>
+        </tr>
+        <tr class="hidden">
+            <td><label class="form-label m-2">Status: </label></td>
+            <td><input name="status" id="status" class="form-control m-2" value="{{ note.status.name }}" required></td>
+        </tr>
+        <tr>
+            <td><label class="form-label m-2">Description: </label></td>
+            <td><textarea class="form-control m-2" name="description" rows="3"  id="description" placeholder="Content.." {% if note.status.name != 'draft' %}disabled{% endif %}>{{ note.description }}</textarea></td>
+        </tr>
+    </table>
+</form>
+
+{% if current_user.has_authorization("Note") and note.status.name == 'draft' and  note.id != None%}
+<a href="../frais/{{ note.id }}" class="btn btn-outline-success" onclick="">
+    <span class="icon-nav-bar d-md-none d-lg-inline-block">
+        <i class="si-plus-square fs-2"></i>
+    </span>
+    Ajouter un frais   
+</a>
+{% endif %}
+
+<div class="page-body">
+    <div class="table-responsive">
+        <table id="table" class="table table-vcenter">
+            <thead class="sticky-top">
+                <tr>
+                    <th>id</th>
+                    <th>date</th>
+                    <th>tiers</th>
+                    <th>value</th>
+                    {% for axe in axes %}
+                    <th>{{ axe.name }}</th>
+                    {% endfor %}
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for analytic in note.noteanalytics %}
+                <tr class="cursor-pointer">
+                    <td>{{ analytic.id }}</td>
+                    <td>{{ analytic.dte.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ analytic.tiers }}</td>
+                    <td class=" {% if analytic.value > 0 %}text-green{% else %}text-red{% endif %}">{{ '%0.2f'| format(analytic.value) }}</td>                    
+                    {% for axe in axes %}
+                    {% if not current_user.has_authorization('Valid Note') or note.status.name not in ['draft', 'presented'] %}
+                    <td>{{ analytic.filter('noteanalyticaxes', 'id_axe', axe.id)[0].value }}</td>
+                    {% else %}
+                    <td>                        
+                        <select class="form-select form-control m-2" name="axe-{{ axe.id }}" id="axe-{{ axe.id }}" onchange="changefrais(this, '{{ config['APP_BASE_URL'] }}/updatefraisaxe/{{ analytic.id }}/{{ axe.id }}')">
+                            {% for value in axe.listing.split('\n') %}
+                                <option value="{{ value }}" {% if analytic.filter('noteanalyticaxes', 'id_axe', axe.id)[0].value == value %}selected{% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    {% endif %}
+                    {% endfor %}
+                    <td>
+                        <a href="../rmfrais/{{ analytic.id}}" class="btn btn-ghost-danger" onclick="">
+                            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                                <i class="si-trash fs-2"></i>
+                            </span>       
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('dte'),
+    		buttonText: {
+    			previousMonth: '<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left --><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>',
+    			nextMonth: '<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right --><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg>',
+    		},
+            lang:'fr-FR',
+            format:'DD/MM/YYYY',
+    	}));
+    });
+    // @formatter:on
+    function changefrais(sel, url){
+        const req = new XMLHttpRequest();
+        req.open("GET", url+'/'+encodeURIComponent(sel.value));
+        req.send();
+    }
+</script>
+{% endblock %}

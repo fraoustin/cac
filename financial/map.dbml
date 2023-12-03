@@ -53,3 +53,35 @@ Table analyticaxe {
     id_axe integer [ref: > axe.id]
     value string [not null]
 }
+
+Table note {
+    id integer [pk, increment]
+    dte date [not null]
+    title string
+    description string
+    who string  [not null]
+    status note_status [default: 'draft']
+}
+
+enum note_status {
+    draft
+    presented
+    valided
+    rejected
+}
+
+Table noteanalytic {
+    id integer [pk, increment]
+    id_note integer [ref: > note.id]
+    value decimal [default: 0]
+    dte date [not null]
+    tiers string
+    description string
+}
+
+Table noteanalyticaxe {
+    id integer [pk, increment]
+    id_analytic integer [ref: > noteanalytic.id]
+    id_axe integer [ref: > axe.id]
+    value string [not null]
+}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+<div class="row align-items-center">
+    <div class="col">
+      <div class="input-icon">
+          <span class="input-icon-addon">
+              <i class="si-search fs-1"></i>
+          </span>
+          <input id="search" type="text" value="" class="form-control form-control-rounded m-2" placeholder="Rechercher dans les notes">
+      </div>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Note") %}
+        <a href="#" class="btn btn-outline-success" onclick="window.location='{{ config['APP_BASE_URL'] }}/note'">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-share fs-2"></i>
+            </span>
+            Ajouter une note
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="page-body">  
+    <div class="table-responsive">
+        <table id="table" class="table table-vcenter">
+            <thead class="sticky-top">
+                <tr>
+                    <th>Date</th>
+                    <th>Qui</th>
+                    <th>Titre</th>
+                    <th>Montant</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for note in notes %}
+                <tr class="cursor-pointer" onclick="window.location='{{ config['APP_BASE_URL'] }}/note/{{ note.id }}'">
+                    <td>{{ note.dte.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ note.who }}</td>
+                    <td>{{ note.title }}</td>
+                    <td class="text-green">{{ "%.2f €"|format(note.noteanalytics | sum(attribute='value')) }}</td>
+                    <td><span  class="status {% if note.status.name == 'presented' %}status-purple{% elif note.status.name == 'valided' %}status-green{% elif note.status.name == 'rejected' %}status-red{% else %}status-grey{% endif %}">{{ note.status.name }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

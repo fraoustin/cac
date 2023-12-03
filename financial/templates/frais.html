@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+<div class="row align-items-center">
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        {% if current_user.has_authorization("Note") %}
+        <a href="#" class="btn btn-outline-success" onclick="window.document.formmvt.submit();">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-disk fs-2"></i>
+            </span>
+            Enregistrer un frais
+        </a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="page-body">  
+    <form action="{{ config['APP_BASE_URL'] }}/frais/{{ note.id }}" class="new" method="POST" name="formmvt">
+        <div id="new" class="table-responsive">
+            <table style="width: 90%;">
+                <tr>
+                    <td><label class="form-label m-2">Date: </label></td>
+                    <td><input class="form-control m-2" placeholder="Select a date" value="{{ now.strftime('%d/%m/%Y') }}"  name="dte" id="dte"></input></td>
+                </tr>
+                <tr>
+                    <td><label class="form-label m-2">Tiers: </label></td>
+                    <td class="select-editable">
+                        <select class="form-select form-control m-2" onchange="this.nextElementSibling.value=this.value">
+                            {% for tier in tiers %}
+                                <option value="{{ tier }}">{{ tier }}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="form-control m-2" name="tiers" id="tiers" value="{{ tiers[0] }}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label m-2">Montant: </label></td>
+                    <td><input class="form-control m-2" name="value" id="value"></input></td>
+                </tr>
+                {% for axe in axes %}
+                <tr>
+                    <td><label class="form-label m-2">{{ axe.name }}</label></td>
+                    <td>
+                        <select class="form-select form-control m-2" name="axe-{{ axe.id }}" id="axe-{{ axe.id }}">
+                            {% for value in axe.listing.split('\n') %}
+                                <option value="{{ value }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>                                
+                {% endfor %}                
+                <tr>
+                    <td><label class="form-label m-2">Description: </label></td>
+                    <td><textarea class="form-control m-2" name="description" rows="5"  id="description" placeholder="Content.."></textarea></td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('dte'),
+    		buttonText: {
+    			previousMonth: '<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left --><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>',
+    			nextMonth: '<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right --><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg>',
+    		},
+            lang:'fr-FR',
+            format:'DD/MM/YYYY',
+    	}));
+    });
+    // @formatter:on
+</script>
+{% endblock %}

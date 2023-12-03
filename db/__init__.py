@@ -10,6 +10,18 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 
+class returnStillNothing(str):
+
+    def __getattr__(self, id):
+        return returnStillNothing()
+
+    def __getitem__(self, i):
+        return returnStillNothing()
+
+    def __call__(self, *args, **kw):
+        return returnStillNothing()
+
+
 class GenericModel(Model):
 
     @classmethod
@@ -55,8 +67,12 @@ class GenericModel(Model):
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-    def filter(self, elt, key, target):
-        return [obj for obj in getattr(self, elt) if getattr(obj, key) == target]
+    def filter(self, elt, key, target, default=returnStillNothing()):
+        val = [obj for obj in getattr(self, elt) if getattr(obj, key) == target]
+        if len(val) > 0:
+            return val
+        else:
+            return default
 
 
 db = SQLAlchemy(model_class=GenericModel)

@@ -116,7 +116,7 @@
             </thead>
             <tbody>
                 {% for mvt in mvts %}
-                <tr class="cursor-pointer">
+                <tr class="cursor-pointer" onclick="window.location='{{ config['APP_BASE_URL'] }}/mouvement/{{ mvt.id }}'">
                     <td>{{ mvt.id }}</td>
                     <td>{{ mvt.compte.name }}</td>
                     <td>{{ mvt.dte.strftime('%d/%m/%Y') }}</td>

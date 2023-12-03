@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+
+{% block navbar %}
+<div class="row align-items-center">
+    <div class="col">
+        <a href="../mouvements" class="btn btn-ghost-success" onclick="">
+            <span class="icon-nav-bar d-md-none d-lg-inline-block">
+                <i class="si-chevron-left fs-2"></i>
+            </span>       
+        </a>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="page-body">  
+    <h1>Mouvement {{ mvt.id }}</h1>
+    <div id="new" class="table-responsive">
+        <table style="width: 90%;">
+            <tr>
+                <td><label class="form-label m-2">Compte: </label></td>
+                <td>{{ mvt.compte.name }}</td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Type de Mouvement: </label></td>
+                <td>{{ mvt.typ.name }}</td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Date: </label></td>
+                <td>{{ mvt.dte.strftime('%d/%m/%Y') }}</td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Tiers: </label></td>
+                <td>{{ mvt.tiers }}</td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Montant: </label></td>
+                <td class="{% if mvt.value > 0 %}text-green{% else %}text-red{% endif %}">{{ '%0.2f €'| format(mvt.value) }}</td>
+            </tr>
+            <tr>
+                <td><label class="form-label m-2">Rapprocher: </label></td>
+                <td><span class="status {% if mvt.closed.name == 'oui' %}status-green{% else %}status-blue{% endif %}">{{ mvt.closed.name }}</span></td>
+            </tr>               
+            <tr>
+                <td><label class="form-label m-2">Description: </label></td>
+                <td>{{ mvt.description }}</td>
+            </tr>
+        </table>
+    </div>
+    <h1>Analytique</h1>
+    <div class="table-responsive">
+        <table id="table" class="table table-vcenter">
+            <thead class="sticky-top">
+                <tr>
+                    <th>id</th>
+                    <th>date</th>
+                    <th>tiers</th>
+                    <th>value</th>
+                    {% for axe in axes %}
+                    <th>{{ axe.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for analytic in mvt.analytics %}
+                <tr class="cursor-pointer">
+                    <td>{{ analytic.id }}</td>
+                    <td>{{ analytic.dte.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ analytic.tiers }}</td>
+                    <td class=" {% if analytic.value > 0 %}text-green{% else %}text-red{% endif %}">{{ '%0.2f'| format(analytic.value) }}</td>                    
+                    {% for axe in axes %}
+                    <td>{{ analytic.filter('analyticaxes', 'id_axe', axe.id)[0].value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
