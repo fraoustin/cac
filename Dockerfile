@@ -23,7 +23,7 @@ RUN mkdir /data
 ENV APP_PORT 5000
 ENV APP_DEBUG false
 ENV APP_HOST 0.0.0.0
-ENV APP_NAME "Edit"
+ENV APP_NAME "CAC 85 Financial"
 ENV DATABASE_DIR /cac/files/uploads
 
 EXPOSE 5000
