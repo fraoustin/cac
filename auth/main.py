@@ -168,7 +168,7 @@ def update_user(id):
                     user.apikey = request.form['apikey']
                 if len(request.form.get('token', '')):
                     user.token = request.form['token']
-                if len(request.form.get('isadmin', '')) and current_user.id != user.id:
+                if current_user.id != user.id:
                     user.isadmin = getBool.get(request.form['isadmin'], False)
                 authorization = ""
                 for key in [key for key in request.form.keys() if key.startswith('autho-')]:

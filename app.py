@@ -10,7 +10,7 @@ from static import Static
 from financial import Financial
 from ged import GedFile
 
-__prg_version__ = "0.0.2"
+__prg_version__ = "0.0.3"
 __prg_name__ = "financial cac"
 
 toBoolean = {'true': True, 'false': False}

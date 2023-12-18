@@ -8,7 +8,7 @@ import random
 from datetime import datetime
 from db.models import add_dbml
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 current_module = sys.modules[__name__]
@@ -18,29 +18,23 @@ add_dbml(os.path.join(os.path.dirname(os.path.abspath(__file__)), "map.dbml"), c
 @login_required
 @checkAuthorization('Ged')
 def geds():
-    return render_template('geds.html', geds=Ged.query.order_by(Ged.name).all())
+    return render_template('geds.html', geds=Ged.query.order_by(Ged.name.desc()).all())
 
 
 @login_required
 @checkAuthorization('Ged')
 def create_ged():
-    print("coucou1")
     if request.method == 'POST':
         obj = Ged()
         for key in [key for key in request.form.keys() if key != 'file']:
             obj.__setattr__(key, request.form[key])
-        print("coucou2")
         file = request.files['file']
-        print("coucou3")
         if 'file' in request.files:
-            print("coucou4")
             file = request.files['file']
             now = datetime.now().strftime("%Y%m%d%H%M%S")
             filename = '%s_%s.%s' % (now, random.randrange(0, 10000), file.filename.rsplit('.', 1)[1].lower())
             pathfile = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            print("coucou5")
             file.save(pathfile)
-            print("coucou6") 
             obj.path = filename
             obj.name = file.filename
         obj.save()
